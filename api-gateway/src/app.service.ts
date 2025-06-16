@@ -44,11 +44,26 @@ export class AppService {
   }
 
   pingHttpService() {
-    const serviceUrl = 'http://localhost:7002/ping-http';
+    const serviceUrl = 'http://localhost:8890/ping-http';
     const retries = 5; 
 
     return this.httpService.get(serviceUrl).pipe(
       httpRetryOperator(serviceUrl, retries) 
+    );
+  }
+
+  pingUnstableService() {
+    // to log whether the request is made to the server
+    console.log(`getData called at ${new Date()}`);
+
+    const response = this.httpService.get('http://localhost:8891');
+    return firstValueFrom(
+      response.pipe(
+        map((res) => res.data),
+        catchError((err) => {
+          throw new Error('Failed to fetch data from the service');
+        }),
+      ),
     );
   }
 }

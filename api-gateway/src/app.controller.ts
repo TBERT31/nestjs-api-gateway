@@ -3,6 +3,7 @@ import { AppService } from './app.service';
 import { zip } from "rxjs";
 import { map } from "rxjs/operators";
 import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
+import { CircuitBreakerInterceptor } from './common/interceptors/circuit-breaker.interceptor';
 
 @Controller()
 @UseInterceptors(CacheInterceptor)
@@ -41,5 +42,11 @@ export class AppController {
   // @Throttle('long') // Appliquer une règle de throttling spécifique
   pingHttp() {
     return this.appService.pingHttpService();
+  }
+
+  @Get('/ping-unstable')
+  @UseInterceptors(CircuitBreakerInterceptor)
+  pingUnstableService() {
+    return this.appService.pingUnstableService();
   }
 }

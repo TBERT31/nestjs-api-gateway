@@ -65,22 +65,22 @@ const redisOptions = {
     ThrottlerModule.forRoot([
       {
         ttl: 60000,   
-        limit: 20,    
+        limit: 100,    
       },
       {
         name: 'short',
         ttl: 1000,
-        limit: 3,
+        limit: 30,
       },
       {
         name: 'medium',
         ttl: 10000,
-        limit: 20
+        limit: 200
       },
       {
         name: 'long',
         ttl: 60000,
-        limit: 100
+        limit: 1000
       }
     ]),
     HttpModule.register({
