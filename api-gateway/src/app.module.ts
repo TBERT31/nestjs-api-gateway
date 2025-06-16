@@ -8,25 +8,27 @@ import KeyvRedis from '@keyv/redis';
 import { Keyv } from 'keyv';
 import { CacheableMemory } from 'cacheable';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import axiosRetry from 'axios-retry'; // Nécessaire pour axiosRetry.exponentialDelay et isNetworkError
+import { AxiosRetryModule } from 'nestjs-axios-retry';
 import { HttpModule } from '@nestjs/axios';
-import axiosRetry from 'axios-retry';
-import axios from 'axios';
 
 const redisOptions = {
-  url: 'redis://localhost:6379', // The Redis server URL (use 'rediss' for TLS)
-  //password: 'your_password', // Optional password if Redis has authentication enabled
+  url: 'redis://localhost:6379', // L'URL du serveur Redis (utiliser 'rediss' pour TLS)
+  //password: 'your_password', // Mot de passe optionnel si Redis a l'authentification activée
 
   socket: {
-    host: 'localhost', // Hostname of the Redis server
-    port: 6379,        // Port number
-    reconnectStrategy: (retries) => Math.min(retries * 50, 2000), // Custom reconnect logic
+    host: 'localhost', // Nom d'hôte du serveur Redis
+    port: 6379,         // Numéro de port
+    reconnectStrategy: (retries) => Math.min(retries * 50, 2000), // Logique de reconnexion personnalisée
     
-    tls: false, // Enable TLS if you need to connect over SSL
-    keepAlive: 1000, // Keep-alive timeout (in milliseconds)
+    tls: false, // Activer TLS si vous avez besoin de vous connecter via SSL
+    keepAlive: 1000, // Délai keep-alive (en millisecondes)
   }
 };
 
-axiosRetry(axios, { retries: 3 });
+// --- CETTE LIGNE A ÉTÉ SUPPRIMÉE POUR PERMETTRE À NESTJS-AXIOS-RETRY DE FONCTIONNER CORRECTEMENT ---
+// axiosRetry(axios, { retries: 3 }); 
+// --- FIN DE LA SUPPRESSION ---
 
 @Module({
   imports: [
@@ -48,7 +50,7 @@ axiosRetry(axios, { retries: 3 });
         },
       },
     ]),
-   CacheModule.registerAsync({
+    CacheModule.registerAsync({
       useFactory: async () => {
         return {
           ttl: 120,
@@ -60,7 +62,7 @@ axiosRetry(axios, { retries: 3 });
                 lruSize: 5000,
               }),
             }),
-           new KeyvRedis(redisOptions),
+            new KeyvRedis(redisOptions),
           ],
         };
       },
@@ -68,7 +70,7 @@ axiosRetry(axios, { retries: 3 });
     ThrottlerModule.forRoot([
       {
         ttl: 60000,   
-        limit: 20,   
+        limit: 20,    
       },
       {
         name: 'short',
@@ -86,11 +88,26 @@ axiosRetry(axios, { retries: 3 });
         limit: 100
       }
     ]),
-    HttpModule.registerAsync({
-      useFactory: async () => ({
-
-      }),
-    })
+    // Importez HttpModule pour utiliser HttpService dans AppService
+    HttpModule.register({
+      timeout: 5000,
+      maxRedirects: 5,
+    }),
+    // Configurez le module de retry Axios pour NestJS
+    // AxiosRetryModule.forRoot({
+    //   axiosRetryConfig: {
+    //     retries: 5, // Nombre de tentatives de retry
+    //     retryDelay: axiosRetry.exponentialDelay, // Délai exponentiel entre les retries
+    //     shouldResetTimeout: true, // Réinitialiser le timeout à chaque retry
+    //     // Conditions de retry : erreurs réseau, status >= 500, ou 429 (Too Many Requests)
+    //     // J'ai remis isNetworkError(error) car c'est une bonne pratique pour les retries
+    //     retryCondition: (error) => axiosRetry.isNetworkError(error) || error.response?.status! >= 500 || error.response?.status === 429,
+    //     // Callback appelé à chaque tentative de retry
+    //     onRetry: (retryCount, error, requestConfig) => {
+    //       console.log(`Retrying HTTP request attempt ${retryCount} for ${requestConfig.url || ''} due to: ${error.message}`);
+    //     },
+    //   },
+    // }),
   ],
   controllers: [AppController],
   providers: [
@@ -105,5 +122,4 @@ axiosRetry(axios, { retries: 3 });
     },
   ],
 })
-
 export class AppModule {}

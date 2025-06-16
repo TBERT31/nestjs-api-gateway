@@ -40,7 +40,6 @@ export class AppController {
   // @CacheTTL(10000) // Par exemple, cacher cette réponse pendant 10 secondes
   // @Throttle('long') // Appliquer une règle de throttling spécifique
   pingHttp() {
-    // Appelle la nouvelle méthode du service
-    return this.appService.getMetrics();
+    return this.appService.pingHttpService();
   }
 }

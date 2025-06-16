@@ -34,6 +34,7 @@
     "cache-manager": "^7.0.0",
     "cache-manager-redis-store": "^3.0.1",
     "cacheable": "^1.10.0",
+    "nestjs-axios-retry": "^1.0.7",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },
