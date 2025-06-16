@@ -20,7 +20,6 @@ export function tcpRetryOperator<T>(serviceIdentifier: string, maxRetries: numbe
 
 
           const delayTime = Math.min(60000, (2 ** retryCount) * 1000); 
-          // --- LOG POUR LE DÉLAI D'ATTENTE ---
           console.log(`⏳ Waiting ${delayTime / 1000} seconds before next retry for ${serviceIdentifier}...`);
           
           return timer(delayTime); 
