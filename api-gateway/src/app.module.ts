@@ -8,8 +8,6 @@ import KeyvRedis from '@keyv/redis';
 import { Keyv } from 'keyv';
 import { CacheableMemory } from 'cacheable';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import axiosRetry from 'axios-retry'; // Nécessaire pour axiosRetry.exponentialDelay et isNetworkError
-import { AxiosRetryModule } from 'nestjs-axios-retry';
 import { HttpModule } from '@nestjs/axios';
 
 const redisOptions = {
@@ -26,9 +24,6 @@ const redisOptions = {
   }
 };
 
-// --- CETTE LIGNE A ÉTÉ SUPPRIMÉE POUR PERMETTRE À NESTJS-AXIOS-RETRY DE FONCTIONNER CORRECTEMENT ---
-// axiosRetry(axios, { retries: 3 }); 
-// --- FIN DE LA SUPPRESSION ---
 
 @Module({
   imports: [
@@ -88,7 +83,6 @@ const redisOptions = {
         limit: 100
       }
     ]),
-    // Importez HttpModule pour utiliser HttpService dans AppService
     HttpModule.register({
       timeout: 5000,
       maxRedirects: 5,
