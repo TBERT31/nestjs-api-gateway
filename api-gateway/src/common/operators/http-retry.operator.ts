@@ -48,7 +48,7 @@ export function httpRetryOperator<T>(requestIdentifier: string, maxRetries: numb
         }
 
         throw new HttpException(
-          `Impossible de joindre le service HTTP (${requestIdentifier}) après plusieurs tentatives (problème réseau ou service non démarré).`,
+          `HTTP service cannot be reached (${requestIdentifier}) after several attempts (network problem or service not started).`,
           HttpStatus.SERVICE_UNAVAILABLE, 
         );
       }),

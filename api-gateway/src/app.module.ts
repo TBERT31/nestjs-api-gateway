@@ -93,21 +93,6 @@ const redisOptions = {
       timeout: 5000,
       maxRedirects: 5,
     }),
-    // Configurez le module de retry Axios pour NestJS
-    // AxiosRetryModule.forRoot({
-    //   axiosRetryConfig: {
-    //     retries: 5, // Nombre de tentatives de retry
-    //     retryDelay: axiosRetry.exponentialDelay, // Délai exponentiel entre les retries
-    //     shouldResetTimeout: true, // Réinitialiser le timeout à chaque retry
-    //     // Conditions de retry : erreurs réseau, status >= 500, ou 429 (Too Many Requests)
-    //     // J'ai remis isNetworkError(error) car c'est une bonne pratique pour les retries
-    //     retryCondition: (error) => axiosRetry.isNetworkError(error) || error.response?.status! >= 500 || error.response?.status === 429,
-    //     // Callback appelé à chaque tentative de retry
-    //     onRetry: (retryCount, error, requestConfig) => {
-    //       console.log(`Retrying HTTP request attempt ${retryCount} for ${requestConfig.url || ''} due to: ${error.message}`);
-    //     },
-    //   },
-    // }),
   ],
   controllers: [AppController],
   providers: [
