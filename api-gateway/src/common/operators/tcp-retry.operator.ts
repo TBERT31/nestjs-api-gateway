@@ -18,7 +18,6 @@ export function tcpRetryOperator<T>(serviceIdentifier: string, maxRetries: numbe
             return throwError(() => error); 
           }
 
-
           const delayTime = Math.min(60000, (2 ** retryCount) * 1000); 
           console.log(`⏳ Waiting ${delayTime / 1000} seconds before next retry for ${serviceIdentifier}...`);
           
